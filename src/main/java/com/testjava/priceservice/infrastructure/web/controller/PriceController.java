@@ -7,6 +7,7 @@ import com.testjava.priceservice.application.port.FindPriceUseCasePort;
 import com.testjava.priceservice.domain.model.PriceQuery;
 import com.testjava.priceservice.domain.model.PriceResult;
 import com.testjava.priceservice.infrastructure.web.dto.PriceResponse;
+import com.testjava.priceservice.infrastructure.web.dto.ErrorResponse;
 import com.testjava.priceservice.infrastructure.web.mapper.PriceResponseMapper;
 import org.springframework.format.annotation.DateTimeFormat;
 import com.testjava.priceservice.infrastructure.common.DateFormats;
@@ -40,8 +41,8 @@ public class PriceController {
             "Automatically selects the price with the highest priority when multiple prices are valid.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Price found successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PriceResponse.class))),
-            @ApiResponse(responseCode = "404", description = "No applicable price found for the given criteria", content = @Content),
-            @ApiResponse(responseCode = "400", description = "Invalid request parameters (e.g., invalid date format)", content = @Content)
+            @ApiResponse(responseCode = "404", description = "No applicable price found for the given criteria", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request parameters (e.g., invalid date format)", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<PriceResponse> getPrice(
             @Parameter(name = "applicationDate", description = "Date and time for price application in format yyyy-MM-dd-HH:mm:ss", example = "2020-06-14-16:00:00", required = true) @RequestParam("applicationDate") @DateTimeFormat(pattern = DateFormats.API_DATE_TIME_FORMAT) LocalDateTime date,
