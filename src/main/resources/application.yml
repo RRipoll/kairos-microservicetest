@@ -42,17 +42,16 @@ management:
     health:
       show-details: when-authorized
       show-components: always
+      probes:
+        enabled: true
     info:
-      enabled: true
-  health:
-    probes:
-      enabled: true
+      access: unrestricted
 
 logging:
   level:
-    com.testjava.priceservice: DEBUG
-    org.springframework.web: WARN
-    org.hibernate: WARN
+    "[com.testjava.priceservice]": DEBUG
+    "[org.springframework.web]": WARN
+    "[org.hibernate]": WARN
 
 # Swagger/OpenAPI Configuration
 springdoc:

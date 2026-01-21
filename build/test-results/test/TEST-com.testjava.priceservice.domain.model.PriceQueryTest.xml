@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.testjava.priceservice.domain.model.PriceQueryTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-01-21T15:08:21" hostname="MSI-GE72-7RE" time="0.001">
-  <properties/>
-  <testcase name="shouldCreatePriceQueryWithValidParameters()" classname="com.testjava.priceservice.domain.model.PriceQueryTest" time="0.001"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

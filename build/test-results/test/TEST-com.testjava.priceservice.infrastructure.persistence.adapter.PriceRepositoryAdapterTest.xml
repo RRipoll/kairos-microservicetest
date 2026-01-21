@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.testjava.priceservice.infrastructure.persistence.adapter.PriceRepositoryAdapterTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-01-21T15:08:21" hostname="MSI-GE72-7RE" time="0.15">
-  <properties/>
-  <testcase name="shouldMapEntitiesToDomainObjects()" classname="com.testjava.priceservice.infrastructure.persistence.adapter.PriceRepositoryAdapterTest" time="0.143"/>
-  <testcase name="shouldPreserveMappingAccuracy()" classname="com.testjava.priceservice.infrastructure.persistence.adapter.PriceRepositoryAdapterTest" time="0.002"/>
-  <testcase name="shouldReturnEmptyListWhenNoEntitiesFound()" classname="com.testjava.priceservice.infrastructure.persistence.adapter.PriceRepositoryAdapterTest" time="0.003"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

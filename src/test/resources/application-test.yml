@@ -2,7 +2,7 @@ spring:
   # Fast H2 configuration for tests
   datasource:
     url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MySQL
-    driverClassName: org.h2.Driver
+    driver-class-name: org.h2.Driver
     username: sa
     password: ""
     
@@ -13,9 +13,9 @@ spring:
     show-sql: false
     properties:
       hibernate:
-        format_sql: false
-        use_sql_comments: false
-        generate_statistics: false
+        "[format_sql]": false
+        "[use_sql_comments]": false
+        "[generate_statistics]": false
         
   sql:
     init:
@@ -28,12 +28,13 @@ spring:
 # Disable unnecessary features for faster startup
 logging:
   level:
-    com.testjava.priceservice: WARN
-    org.springframework: WARN
-    org.hibernate: WARN
+    "[com.testjava.priceservice]": WARN
+    "[org.springframework]": WARN
+    "[org.hibernate]": WARN
     root: ERROR
     
 # Test-specific configurations    
 management:
   endpoints:
-    enabled-by-default: false
+    access:
+      default: none

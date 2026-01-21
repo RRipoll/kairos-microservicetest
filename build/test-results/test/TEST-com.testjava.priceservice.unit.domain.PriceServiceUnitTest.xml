@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="Unit Tests - Price Service" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-01-21T15:08:22" hostname="MSI-GE72-7RE" time="0.011">
-  <properties/>
-  <testcase name="Should return first price when database query returns single result" classname="com.testjava.priceservice.unit.domain.PriceServiceUnitTest" time="0.003"/>
-  <testcase name="Should return price result when highest priority price found" classname="com.testjava.priceservice.unit.domain.PriceServiceUnitTest" time="0.002"/>
-  <testcase name="Should return empty when no prices found" classname="com.testjava.priceservice.unit.domain.PriceServiceUnitTest" time="0.004"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>
