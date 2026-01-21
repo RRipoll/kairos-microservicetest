@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Unit Tests - Find Price Use Case" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-01-21T15:08:22" hostname="MSI-GE72-7RE" time="0.021">
+  <properties/>
+  <testcase name="Should validate query before execution" classname="com.testjava.priceservice.unit.application.FindPriceUseCaseUnitTest" time="0.011"/>
+  <testcase name="Should return empty when no price found" classname="com.testjava.priceservice.unit.application.FindPriceUseCaseUnitTest" time="0.005"/>
+  <testcase name="Should execute successfully with valid query" classname="com.testjava.priceservice.unit.application.FindPriceUseCaseUnitTest" time="0.004"/>
+  <system-out><![CDATA[16:08:22.368 [Test worker] INFO com.testjava.priceservice.application.usecase.FindPriceUseCase -- Executing price lookup for productId=35455, brandId=1, date=2020-06-14T16:00
+16:08:22.369 [Test worker] WARN com.testjava.priceservice.application.usecase.FindPriceUseCase -- Price lookup failed: no applicable price found for productId=35455, brandId=1
+16:08:22.377 [Test worker] INFO com.testjava.priceservice.application.usecase.FindPriceUseCase -- Executing price lookup for productId=35455, brandId=1, date=2020-06-14T16:00
+16:08:22.377 [Test worker] WARN com.testjava.priceservice.application.usecase.FindPriceUseCase -- Price lookup failed: no applicable price found for productId=35455, brandId=1
+16:08:22.382 [Test worker] INFO com.testjava.priceservice.application.usecase.FindPriceUseCase -- Executing price lookup for productId=35455, brandId=1, date=2020-06-14T16:00
+16:08:22.382 [Test worker] INFO com.testjava.priceservice.application.usecase.FindPriceUseCase -- Price lookup successful: found price=35.50 for priceList=1
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Unit Tests - Price Entity Mapper" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-01-21T15:08:22" hostname="MSI-GE72-7RE" time="0.017">
+  <properties/>
+  <testcase name="Should map Price to PriceEntity correctly" classname="com.testjava.priceservice.unit.infrastructure.mappers.PriceEntityMapperUnitTest" time="0.0"/>
+  <testcase name="Should preserve precision for BigDecimal values" classname="com.testjava.priceservice.unit.infrastructure.mappers.PriceEntityMapperUnitTest" time="0.0"/>
+  <testcase name="Should map entity with custom values correctly" classname="com.testjava.priceservice.unit.infrastructure.mappers.PriceEntityMapperUnitTest" time="0.0"/>
+  <testcase name="Should map multiple entities consistently" classname="com.testjava.priceservice.unit.infrastructure.mappers.PriceEntityMapperUnitTest" time="0.001"/>
+  <testcase name="Should handle null price in mapToEntity" classname="com.testjava.priceservice.unit.infrastructure.mappers.PriceEntityMapperUnitTest" time="0.001"/>
+  <testcase name="Should map PriceEntity to Price domain object correctly" classname="com.testjava.priceservice.unit.infrastructure.mappers.PriceEntityMapperUnitTest" time="0.001"/>
+  <testcase name="Should handle null input gracefully" classname="com.testjava.priceservice.unit.infrastructure.mappers.PriceEntityMapperUnitTest" time="0.001"/>
+  <testcase name="Should validate date consistency after mapping" classname="com.testjava.priceservice.unit.infrastructure.mappers.PriceEntityMapperUnitTest" time="0.003"/>
+  <testcase name="Should handle edge case values correctly" classname="com.testjava.priceservice.unit.infrastructure.mappers.PriceEntityMapperUnitTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

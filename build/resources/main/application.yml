@@ -1,0 +1,66 @@
+spring:
+
+  # Default database configuration
+  # Note: this is a test project, we set here the user/password default values for testing porpoise only.
+  # These defaults are used when TESTJAVA_DB_USERNAME and TESTJAVA_DB_PASSWORD environment variables are not set.
+  # These values shouldn't be explicit defined in the code in a real project.
+  # The correct way is set these values in a secret container.
+
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: ${TESTJAVA_DB_USERNAME:sa}
+    password: ${TESTJAVA_DB_PASSWORD:password}
+  
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    defer-datasource-initialization: true
+  
+  sql:
+    init:
+      mode: always
+
+server:
+  port: ${SERVER_PORT:8080}
+
+# Management endpoints configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+      show-components: always
+    info:
+      enabled: true
+  health:
+    probes:
+      enabled: true
+
+logging:
+  level:
+    com.testjava.priceservice: DEBUG
+    org.springframework.web: WARN
+    org.hibernate: WARN
+
+# Swagger/OpenAPI Configuration
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    display-request-duration: true
+    groups-order: DESC
+  show-actuator: false

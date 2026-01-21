@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.testjava.priceservice.domain.PriceServiceUnitTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-01-21T15:08:21" hostname="MSI-GE72-7RE" time="0.091">
+  <properties/>
+  <testcase name="shouldSelectHighestPriorityAmongMultipleApplicablePrices()" classname="com.testjava.priceservice.domain.PriceServiceUnitTest" time="0.071"/>
+  <testcase name="shouldReturnEmptyWhenNoPricesAreApplicableAtDate()" classname="com.testjava.priceservice.domain.PriceServiceUnitTest" time="0.004"/>
+  <testcase name="shouldReturnOnlyApplicablePriceWhenOneExists()" classname="com.testjava.priceservice.domain.PriceServiceUnitTest" time="0.004"/>
+  <testcase name="shouldReturnEmptyWhenNoPricesFound()" classname="com.testjava.priceservice.domain.PriceServiceUnitTest" time="0.003"/>
+  <testcase name="shouldReturnHighestPriorityPrice()" classname="com.testjava.priceservice.domain.PriceServiceUnitTest" time="0.004"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
