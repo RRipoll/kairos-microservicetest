@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: price-service-config
+  labels:
+    app: price-service
+data:
+  SERVER_PORT: "8080"
+  # Never commit real passwords to version control
+  TESTJAVA_DB_USERNAME: "sa"
+  SPRING_PROFILES_ACTIVE: "prod"

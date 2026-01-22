@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: price-service
+  labels:
+    app: price-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: price-service
+  template:
+    metadata:
+      labels:
+        app: price-service
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - name: price-service
+        image: price-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: price-service-config
+        - secretRef:
+            name: price-service-secret
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 15
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 8080
+          initialDelaySeconds: 20
+          periodSeconds: 10
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "512Mi"
+          limits:
+            cpu: "500m"
+            memory: "1Gi"

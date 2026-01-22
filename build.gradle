@@ -1,78 +1,115 @@
 plugins {
-    id 'java'
-    id 'org.springframework.boot' version '3.4.0'
-    id 'io.spring.dependency-management' version '1.1.6'
-    id 'jacoco'
-    id 'checkstyle'
+	id 'java'
+	id 'org.springframework.boot' version '3.4.0'
+	id 'io.spring.dependency-management' version '1.1.6'
+	id 'jacoco'
+	id 'checkstyle'
+	id 'com.diffplug.spotless' version '6.25.0'
 }
 
 group = 'com.testjava'
 version = '0.1.0'
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
+	sourceCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
 }
 
 repositories {
-    mavenCentral()
+	mavenCentral()
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
 
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    annotationProcessor 'org.springframework.boot:spring-boot-starter-test' // Note: this is already there but I'll add the processor next to it
-    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	annotationProcessor 'org.springframework.boot:spring-boot-starter-test' // Note: this is already there but I'll add the processor next to it
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
-    runtimeOnly 'com.h2database:h2'
+	runtimeOnly 'com.h2database:h2'
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
 
-    // Resilience
-    implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.2.0'
-    implementation 'org.springframework.boot:spring-boot-starter-aop'
+	// Resilience
+	implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.2.0'
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
 }
 
 tasks.withType(Test).configureEach {
-    useJUnitPlatform()
+	useJUnitPlatform()
 }
 
 springBoot {
-    mainClass = 'com.testjava.priceservice.PriceServiceApplication'
+	mainClass = 'com.testjava.priceservice.PriceServiceApplication'
 }
 
 jacocoTestReport {
-    dependsOn test
-    reports {
-        xml.required = true
-        html.required = true
-    }
+	dependsOn test
+	reports {
+		xml.required = true
+		html.required = true
+	}
 }
 
 checkstyle {
-    toolVersion = '10.12.5'
-    configFile = file("${project.rootDir}/config/checkstyle/checkstyle.xml")
-    ignoreFailures = true
-    maxWarnings = 0
+	toolVersion = '10.12.5'
+	configFile = file("${project.rootDir}/config/checkstyle/checkstyle.xml")
+	ignoreFailures = true
+	maxWarnings = 0
 }
 
 configurations.checkstyle {
-    resolutionStrategy.capabilitiesResolution.withCapability("com.google.collections:google-collections") {
-        select("com.google.guava:guava:0")
-    }
+	resolutionStrategy.capabilitiesResolution.withCapability("com.google.collections:google-collections") {
+		select("com.google.guava:guava:0")
+	}
 }
 
 test {
-    finalizedBy jacocoTestReport
+	finalizedBy jacocoTestReport
+}
+
+// Spotless configuration for code formatting
+spotless {
+	java {
+		// Use Google Java Format
+		googleJavaFormat('1.19.2')
+
+		// Remove unused imports
+		removeUnusedImports()
+
+		// Format according to style guidelines
+		importOrder('java', 'jakarta', 'javax', 'org', 'com', '')
+
+		// Ensure files end with a newline
+		endWithNewline()
+
+		// Apply to all Java files
+		target 'src/**/*.java'
+
+		// Optional: Toggle off for generated code
+		targetExclude 'build/**'
+	}
+
+	// Format Gradle build files
+	groovyGradle {
+		target '*.gradle'
+		greclipse()
+	}
+
+	// Format other text files
+	format 'misc', {
+		target '*.md', '.gitignore'
+		trimTrailingWhitespace()
+		endWithNewline()
+	}
 }

@@ -1,0 +1,34 @@
+{
+  "groups": [
+    {
+      "name": "app",
+      "type": "com.testjava.priceservice.infrastructure.config.AppSecurityProperties",
+      "sourceType": "com.testjava.priceservice.infrastructure.config.AppSecurityProperties"
+    },
+    {
+      "name": "app.security",
+      "type": "com.testjava.priceservice.infrastructure.config.AppSecurityProperties$Security",
+      "sourceType": "com.testjava.priceservice.infrastructure.config.AppSecurityProperties",
+      "sourceMethod": "public com.testjava.priceservice.infrastructure.config.AppSecurityProperties.Security getSecurity() "
+    },
+    {
+      "name": "app.security.user",
+      "type": "com.testjava.priceservice.infrastructure.config.AppSecurityProperties$Security$User",
+      "sourceType": "com.testjava.priceservice.infrastructure.config.AppSecurityProperties$Security",
+      "sourceMethod": "public com.testjava.priceservice.infrastructure.config.AppSecurityProperties.Security.User getUser() "
+    }
+  ],
+  "properties": [
+    {
+      "name": "app.security.user.password",
+      "type": "java.lang.String",
+      "sourceType": "com.testjava.priceservice.infrastructure.config.AppSecurityProperties$Security$User"
+    },
+    {
+      "name": "app.security.user.username",
+      "type": "java.lang.String",
+      "sourceType": "com.testjava.priceservice.infrastructure.config.AppSecurityProperties$Security$User"
+    }
+  ],
+  "hints": []
+}
