@@ -21,6 +21,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -42,8 +44,10 @@ public class PriceController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Price found successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PriceResponse.class))),
             @ApiResponse(responseCode = "404", description = "No applicable price found for the given criteria", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid request parameters (e.g., invalid date format)", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "400", description = "Invalid request parameters (e.g., invalid date format)", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "503", description = "Service unavailable due to circuit breaker", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @CircuitBreaker(name = "priceService", fallbackMethod = "fallbackGetPrice")
     public ResponseEntity<PriceResponse> getPrice(
             @Parameter(name = "applicationDate", description = "Date and time for price application in format yyyy-MM-dd-HH:mm:ss", example = "2020-06-14-16:00:00", required = true) @RequestParam("applicationDate") @DateTimeFormat(pattern = DateFormats.API_DATE_TIME_FORMAT) LocalDateTime date,
 
@@ -54,28 +58,36 @@ public class PriceController {
         log.info("Received price request - date: {}, productId: {}, brandId: {}",
                 date, productId, brandId);
 
-        try {
-            // Create query
-            PriceQuery query = new PriceQuery(date, productId, brandId);
+        // Create query
+        PriceQuery query = new PriceQuery(date, productId, brandId);
 
-            // Execute use case
-            Optional<PriceResult> result = findPriceUseCase.execute(query);
+        // Execute use case
+        Optional<PriceResult> result = findPriceUseCase.execute(query);
 
-            // Handle response
-            return result
-                    .map(responseMapper::mapToResponse)
-                    .map(response -> {
-                        log.info("Price request successful - returning price: {}", response.getPrice());
-                        return ResponseEntity.ok(response);
-                    })
-                    .orElseGet(() -> {
-                        log.info("Price request completed - no price found for given criteria");
-                        return ResponseEntity.notFound().build();
-                    });
-        } catch (Exception e) {
-            log.error("Error processing price request: {}", e.getMessage(), e);
-            throw e;
-        }
+        // Handle response
+        return result
+                .map(responseMapper::mapToResponse)
+                .map(response -> {
+                    log.info("Price request successful - returning price: {}", response.getPrice());
+                    return ResponseEntity.ok(response);
+                })
+                .orElseGet(() -> {
+                    log.info("Price request completed - no price found for given criteria");
+                    return ResponseEntity.notFound().build();
+                });
+    }
+
+    /**
+     * Fallback method for getPrice when the circuit is open or an error occurs.
+     */
+    public ResponseEntity<PriceResponse> fallbackGetPrice(LocalDateTime date, Long productId, Long brandId,
+            Exception e) {
+        log.error(
+                "Circuit breaker fallback triggered for price request - date: {}, productId: {}, brandId: {}. Error: {}",
+                date, productId, brandId, e.getMessage());
+
+        // Return 503 Service Unavailable when the system is under pressure or failing
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
     }
 
 }
