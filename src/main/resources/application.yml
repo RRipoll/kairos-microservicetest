@@ -75,3 +75,9 @@ resilience4j:
         waitDurationInOpenState: 5s
         failureRateThreshold: 50
         eventConsumerBufferSize: 10
+
+app:
+  security:
+    user:
+      username: ${APP_SECURITY_USER:user}
+      password: ${APP_SECURITY_PASSWORD:password}
