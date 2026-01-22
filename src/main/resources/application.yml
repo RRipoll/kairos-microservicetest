@@ -14,7 +14,10 @@ spring:
   
   h2:
     console:
-      enabled: true
+      # SECURITY: H2 console is disabled by default for security reasons
+      # To enable for local development, set spring.h2.console.enabled=true
+      # or use the 'dev' profile
+      enabled: false
       path: /h2-console
   
   jpa:
@@ -32,11 +35,14 @@ server:
   port: ${SERVER_PORT:8080}
 
 # Management endpoints configuration
+# SECURITY: Actuator endpoints should be secured in production
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus
+        # Only expose essential endpoints by default
+        # Add more endpoints only if needed and properly secured
+        include: health,info
       base-path: /actuator
   endpoint:
     health:
