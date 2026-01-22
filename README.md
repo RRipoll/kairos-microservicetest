@@ -426,6 +426,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📚 Documentation
 
-- **Architecture**: See [CLAUDE.md](CLAUDE.md) for detailed architecture guide
 - **API Documentation**: Available at `/swagger-ui.html` when running
 - **Changelog**: See [CHANGELOG.md](CHANGELOG.md) for version history
