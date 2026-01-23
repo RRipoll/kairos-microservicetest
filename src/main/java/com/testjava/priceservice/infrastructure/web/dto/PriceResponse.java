@@ -36,4 +36,7 @@ public class PriceResponse {
 
   @Schema(description = "Final sale price", example = "25.45")
   private BigDecimal price;
+
+  @Schema(description = "Currency ISO code", example = "EUR")
+  private String currency;
 }

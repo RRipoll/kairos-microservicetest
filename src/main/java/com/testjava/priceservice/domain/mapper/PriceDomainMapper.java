@@ -32,6 +32,7 @@ public class PriceDomainMapper {
         price.getPriceList(),
         price.getStartDate(),
         price.getEndDate(),
-        price.getPrice());
+        price.getPrice(),
+        price.getCurrency());
   }
 }

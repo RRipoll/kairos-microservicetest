@@ -42,7 +42,8 @@ class PriceResponseMapperUnitTest implements TestCategories.UnitTest {
             1,
             startDate,
             endDate,
-            TEST_PRICE_35_50);
+            TEST_PRICE_35_50,
+            TEST_CURRENCY);
 
     // When
     PriceResponse response = mapper.mapToResponse(priceResult);
@@ -55,6 +56,7 @@ class PriceResponseMapperUnitTest implements TestCategories.UnitTest {
     assertThat(response.getStartDate()).isEqualTo(startDate);
     assertThat(response.getEndDate()).isEqualTo(endDate);
     assertThat(response.getPrice()).isEqualTo(TEST_PRICE_35_50);
+    assertThat(response.getCurrency()).isEqualTo(TEST_CURRENCY);
   }
 
   @Test
@@ -79,7 +81,8 @@ class PriceResponseMapperUnitTest implements TestCategories.UnitTest {
             4, // Custom price list
             customStartDate,
             customEndDate,
-            TEST_PRICE_38_95);
+            TEST_PRICE_38_95,
+            TEST_CURRENCY);
 
     // When
     PriceResponse response = mapper.mapToResponse(priceResult);
@@ -91,6 +94,7 @@ class PriceResponseMapperUnitTest implements TestCategories.UnitTest {
     assertThat(response.getStartDate()).isEqualTo(customStartDate);
     assertThat(response.getEndDate()).isEqualTo(customEndDate);
     assertThat(response.getPrice()).isEqualTo(TEST_PRICE_38_95);
+    assertThat(response.getCurrency()).isEqualTo(TEST_CURRENCY);
   }
 
   @Test
@@ -104,7 +108,8 @@ class PriceResponseMapperUnitTest implements TestCategories.UnitTest {
             0, // Minimum price list
             LocalDateTime.MIN,
             LocalDateTime.MAX,
-            BigDecimal.ZERO);
+            BigDecimal.ZERO,
+            "EUR");
 
     // When
     PriceResponse response = mapper.mapToResponse(priceResult);
@@ -112,7 +117,7 @@ class PriceResponseMapperUnitTest implements TestCategories.UnitTest {
     // Then
     assertThat(response.getProductId()).isEqualTo(1L);
     assertThat(response.getBrandId()).isEqualTo(Long.MAX_VALUE);
-    assertThat(response.getPriceList()).isEqualTo(0);
+    assertThat(response.getPriceList()).isZero();
     assertThat(response.getStartDate()).isEqualTo(LocalDateTime.MIN);
     assertThat(response.getEndDate()).isEqualTo(LocalDateTime.MAX);
     assertThat(response.getPrice()).isEqualTo(BigDecimal.ZERO);
@@ -130,7 +135,8 @@ class PriceResponseMapperUnitTest implements TestCategories.UnitTest {
             1,
             TestDataFactory.TEST_START_DATE,
             TestDataFactory.TEST_END_DATE,
-            precisePrice);
+            precisePrice,
+            TEST_CURRENCY);
 
     // When
     PriceResponse response = mapper.mapToResponse(priceResult);

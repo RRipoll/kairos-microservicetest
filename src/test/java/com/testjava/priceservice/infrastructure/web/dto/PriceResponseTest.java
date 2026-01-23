@@ -31,7 +31,8 @@ class PriceResponseTest {
     LocalDateTime endDate = LocalDateTime.of(2020, 6, 14, 18, 30);
 
     // When
-    PriceResponse response = new PriceResponse(35455L, 1L, 2, startDate, endDate, TEST_PRICE_25_45);
+    PriceResponse response =
+        new PriceResponse(35455L, 1L, 2, startDate, endDate, TEST_PRICE_25_45, "EUR");
 
     // Then
     assertEquals(35455L, response.getProductId());
@@ -56,6 +57,7 @@ class PriceResponseTest {
     response.setStartDate(startDate);
     response.setEndDate(endDate);
     response.setPrice(TEST_PRICE_35_50);
+    response.setCurrency("EUR");
 
     // Then
     assertEquals(35455L, response.getProductId());
@@ -64,6 +66,7 @@ class PriceResponseTest {
     assertEquals(startDate, response.getStartDate());
     assertEquals(endDate, response.getEndDate());
     assertEquals(TEST_PRICE_35_50, response.getPrice());
+    assertEquals("EUR", response.getCurrency());
   }
 
   @Test
@@ -72,7 +75,8 @@ class PriceResponseTest {
     LocalDateTime startDate = LocalDateTime.of(2020, 6, 14, 15, 0);
     LocalDateTime endDate = LocalDateTime.of(2020, 6, 14, 18, 30);
 
-    PriceResponse response = new PriceResponse(35455L, 1L, 2, startDate, endDate, TEST_PRICE_25_45);
+    PriceResponse response =
+        new PriceResponse(35455L, 1L, 2, startDate, endDate, TEST_PRICE_25_45, "EUR");
 
     // When
     String json = objectMapper.writeValueAsString(response);

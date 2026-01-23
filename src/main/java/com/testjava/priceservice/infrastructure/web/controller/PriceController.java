@@ -104,7 +104,7 @@ public class PriceController {
           Long productId,
       @Parameter(
               name = "brandId",
-              description = "Brand identifier (1 = ZARA)",
+              description = "Brand identifier (1)",
               example = "1",
               required = true)
           @RequestParam("brandId")

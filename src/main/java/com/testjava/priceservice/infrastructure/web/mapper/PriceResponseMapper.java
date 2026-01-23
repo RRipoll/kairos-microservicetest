@@ -31,6 +31,7 @@ public class PriceResponseMapper {
         result.getPriceList(),
         result.getStartDate(),
         result.getEndDate(),
-        result.getPrice());
+        result.getPrice(),
+        result.getCurrency());
   }
 }

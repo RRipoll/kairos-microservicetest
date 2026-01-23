@@ -44,7 +44,8 @@ class FindPriceUseCaseTest {
             2,
             LocalDateTime.of(2020, 6, 14, 15, 0),
             LocalDateTime.of(2020, 6, 14, 18, 30),
-            TEST_PRICE_25_45);
+            TEST_PRICE_25_45,
+            TEST_CURRENCY);
 
     when(priceService.findApplicablePrice(query)).thenReturn(Optional.of(expectedResult));
 

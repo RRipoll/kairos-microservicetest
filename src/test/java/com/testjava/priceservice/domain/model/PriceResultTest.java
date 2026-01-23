@@ -14,7 +14,8 @@ class PriceResultTest {
     LocalDateTime startDate = LocalDateTime.of(2020, 6, 14, 0, 0);
     LocalDateTime endDate = LocalDateTime.of(2020, 12, 31, 23, 59);
 
-    PriceResult result = new PriceResult(35455L, 1L, 1, startDate, endDate, TEST_PRICE_35_50);
+    PriceResult result =
+        new PriceResult(35455L, 1L, 1, startDate, endDate, TEST_PRICE_35_50, TEST_CURRENCY);
 
     assertEquals(35455L, result.getProductId());
     assertEquals(1L, result.getBrandId());

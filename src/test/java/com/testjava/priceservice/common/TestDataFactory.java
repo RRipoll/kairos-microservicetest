@@ -129,7 +129,8 @@ public final class TestDataFactory {
         1,
         TEST_DATE_2020_06_14_16_00,
         TEST_DATE_2020_06_14_16_00,
-        TEST_PRICE_35_50);
+        TEST_PRICE_35_50,
+        TEST_CURRENCY);
   }
 
   public static PriceEntity createTestPriceEntity() {
@@ -164,7 +165,8 @@ public final class TestDataFactory {
         1,
         TEST_DATE_2020_06_14_16_00,
         TEST_DATE_2020_06_14_16_00,
-        TEST_PRICE_35_50);
+        TEST_PRICE_35_50,
+        TEST_CURRENCY);
   }
 
   /** Builder for creating test scenarios */

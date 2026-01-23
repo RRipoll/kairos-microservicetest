@@ -16,4 +16,5 @@ public class PriceResult {
   private final LocalDateTime startDate;
   private final LocalDateTime endDate;
   private final BigDecimal price;
+  private final String currency;
 }

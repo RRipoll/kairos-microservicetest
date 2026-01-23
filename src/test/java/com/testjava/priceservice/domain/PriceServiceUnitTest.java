@@ -64,7 +64,8 @@ class PriceServiceUnitTest {
             TEST_PRICE_LIST_2,
             LocalDateTime.of(2020, 6, 14, 15, 0),
             LocalDateTime.of(2020, 6, 14, 18, 30),
-            TEST_PRICE_25_45);
+            TEST_PRICE_25_45,
+            TEST_CURRENCY);
     when(domainMapper.mapToResult(prices.get(0))).thenReturn(expectedResult);
 
     PriceQuery query = new PriceQuery(testDate, productId, brandId);
@@ -109,7 +110,8 @@ class PriceServiceUnitTest {
             1,
             LocalDateTime.of(2020, 6, 14, 0, 0),
             LocalDateTime.of(2020, 12, 31, 23, 59),
-            TEST_PRICE_35_50);
+            TEST_PRICE_35_50,
+            TEST_CURRENCY);
     when(domainMapper.mapToResult(prices.get(0))).thenReturn(expectedResult);
 
     PriceQuery query = new PriceQuery(testDate, productId, brandId);
@@ -202,7 +204,8 @@ class PriceServiceUnitTest {
             4,
             LocalDateTime.of(2020, 6, 15, 16, 0),
             LocalDateTime.of(2020, 12, 31, 23, 59),
-            TEST_PRICE_38_95);
+            TEST_PRICE_38_95,
+            "EUR");
     when(domainMapper.mapToResult(prices.get(0))).thenReturn(expectedResult);
 
     PriceQuery query = new PriceQuery(testDate, productId, brandId);
