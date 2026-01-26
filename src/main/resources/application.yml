@@ -81,6 +81,8 @@ resilience4j:
         waitDurationInOpenState: 5s
         failureRateThreshold: 50
         eventConsumerBufferSize: 10
+        ignoreExceptions:
+          - com.testjava.priceservice.domain.exception.PriceNotFoundException
 
 app:
   security:

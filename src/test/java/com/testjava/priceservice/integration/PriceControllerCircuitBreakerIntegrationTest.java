@@ -7,6 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -23,6 +24,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.testjava.priceservice.application.port.FindPriceUseCasePort;
 import com.testjava.priceservice.common.TestCategories;
+import com.testjava.priceservice.domain.model.PriceResult;
 import com.testjava.priceservice.infrastructure.common.DateFormats;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
@@ -113,12 +115,21 @@ class PriceControllerCircuitBreakerIntegrationTest implements TestCategories.Int
     Thread.sleep(6000);
 
     // 3. Make a call - should be HALF_OPEN
-    // When service starts working again
+    // When service starts working again - return successful price results
     reset(findPriceUseCase);
-    when(findPriceUseCase.execute(any())).thenReturn(java.util.Optional.empty());
+    PriceResult mockResult =
+        new PriceResult(
+            35455L,
+            1L,
+            1,
+            LocalDateTime.now().minusDays(1),
+            LocalDateTime.now().plusDays(1),
+            new BigDecimal("35.50"),
+            "EUR");
+    when(findPriceUseCase.execute(any())).thenReturn(java.util.Optional.of(mockResult));
 
     ResponseEntity<String> response = makeCall();
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
     // Should be HALF_OPEN now
     assertThat(circuitBreakerRegistry.circuitBreaker("priceService").getState())
