@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,6 +21,7 @@ import com.testjava.priceservice.domain.model.PriceQuery;
 import com.testjava.priceservice.domain.model.PriceResult;
 import com.testjava.priceservice.domain.port.PriceRepository;
 import com.testjava.priceservice.domain.service.PriceService;
+import com.testjava.priceservice.domain.strategy.PriceSelectionStrategy;
 
 class PriceServiceUnitTest {
 
@@ -27,12 +29,14 @@ class PriceServiceUnitTest {
 
   @Mock private PriceDomainMapper domainMapper;
 
+  @Mock private PriceSelectionStrategy priceSelectionStrategy;
+
   private PriceService priceService;
 
   @BeforeEach
   void setUp() {
     MockitoAnnotations.openMocks(this);
-    priceService = new PriceService(priceRepository, domainMapper);
+    priceService = new PriceService(priceRepository, domainMapper, priceSelectionStrategy);
   }
 
   @Test
@@ -54,8 +58,9 @@ class PriceServiceUnitTest {
                 TEST_PRICE_25_45,
                 TEST_CURRENCY));
 
-    when(priceRepository.findApplicablePrice(testDate, productId, brandId))
-        .thenReturn(Optional.of(prices.get(0)));
+    when(priceRepository.findApplicablePrices(testDate, productId, brandId)).thenReturn(prices);
+
+    when(priceSelectionStrategy.selectPrice(prices)).thenReturn(Optional.of(prices.get(0)));
 
     PriceResult expectedResult =
         new PriceResult(
@@ -100,8 +105,9 @@ class PriceServiceUnitTest {
                 TEST_PRICE_35_50,
                 TEST_CURRENCY));
 
-    when(priceRepository.findApplicablePrice(testDate, productId, brandId))
-        .thenReturn(Optional.of(prices.get(0)));
+    when(priceRepository.findApplicablePrices(testDate, productId, brandId)).thenReturn(prices);
+
+    when(priceSelectionStrategy.selectPrice(prices)).thenReturn(Optional.of(prices.get(0)));
 
     PriceResult expectedResult =
         new PriceResult(
@@ -132,8 +138,10 @@ class PriceServiceUnitTest {
     Long productId = TEST_PRODUCT_ID;
     Long brandId = TEST_BRAND_ID;
 
-    when(priceRepository.findApplicablePrice(testDate, productId, brandId))
-        .thenReturn(Optional.empty());
+    when(priceRepository.findApplicablePrices(testDate, productId, brandId))
+        .thenReturn(Collections.emptyList());
+
+    when(priceSelectionStrategy.selectPrice(Collections.emptyList())).thenReturn(Optional.empty());
 
     PriceQuery query = new PriceQuery(testDate, productId, brandId);
 
@@ -151,20 +159,11 @@ class PriceServiceUnitTest {
     Long productId = TEST_PRODUCT_ID;
     Long brandId = TEST_BRAND_ID;
 
-    List<Price> prices =
-        Arrays.asList(
-            new Price(
-                1L,
-                LocalDateTime.of(2020, 6, 14, 0, 0),
-                LocalDateTime.of(2020, 12, 31, 23, 59),
-                TEST_PRICE_LIST_1,
-                TEST_PRODUCT_ID,
-                TEST_PRIORITY_0,
-                TEST_PRICE_35_50,
-                TEST_CURRENCY));
+    // Repository returns empty list when no prices match date criteria
+    when(priceRepository.findApplicablePrices(testDate, productId, brandId))
+        .thenReturn(Collections.emptyList());
 
-    when(priceRepository.findApplicablePrice(testDate, productId, brandId))
-        .thenReturn(Optional.of(prices.get(0)));
+    when(priceSelectionStrategy.selectPrice(Collections.emptyList())).thenReturn(Optional.empty());
 
     PriceQuery query = new PriceQuery(testDate, productId, brandId);
 
@@ -194,8 +193,9 @@ class PriceServiceUnitTest {
                 TEST_PRICE_38_95,
                 "EUR"));
 
-    when(priceRepository.findApplicablePrice(testDate, productId, brandId))
-        .thenReturn(Optional.of(prices.get(0)));
+    when(priceRepository.findApplicablePrices(testDate, productId, brandId)).thenReturn(prices);
+
+    when(priceSelectionStrategy.selectPrice(prices)).thenReturn(Optional.of(prices.get(0)));
 
     PriceResult expectedResult =
         new PriceResult(

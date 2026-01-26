@@ -4,6 +4,8 @@ import static com.testjava.priceservice.common.TestDataFactory.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +24,7 @@ import com.testjava.priceservice.domain.model.PriceQuery;
 import com.testjava.priceservice.domain.model.PriceResult;
 import com.testjava.priceservice.domain.port.PriceRepository;
 import com.testjava.priceservice.domain.service.PriceService;
+import com.testjava.priceservice.domain.strategy.PriceSelectionStrategy;
 
 @ExtendWith(MockitoExtension.class)
 @Tag(UNIT_TAG)
@@ -32,11 +35,13 @@ class PriceServiceUnitTest implements TestCategories.UnitTest {
 
   @Mock private PriceDomainMapper domainMapper;
 
+  @Mock private PriceSelectionStrategy priceSelectionStrategy;
+
   private PriceService priceService;
 
   @BeforeEach
   void setUp() {
-    priceService = new PriceService(priceRepository, domainMapper);
+    priceService = new PriceService(priceRepository, domainMapper, priceSelectionStrategy);
   }
 
   @Test
@@ -47,9 +52,13 @@ class PriceServiceUnitTest implements TestCategories.UnitTest {
     Price highestPriorityPrice = TestDataFactory.createTestPrice(2, 1, TEST_PRICE_25_45);
     PriceResult expectedResult = TestDataFactory.createTestPriceResult();
 
-    when(priceRepository.findApplicablePrice(
+    List<Price> prices = List.of(highestPriorityPrice);
+
+    when(priceRepository.findApplicablePrices(
             query.getApplicationDate(), query.getProductId(), query.getBrandId()))
-        .thenReturn(Optional.of(highestPriorityPrice));
+        .thenReturn(prices);
+
+    when(priceSelectionStrategy.selectPrice(prices)).thenReturn(Optional.of(highestPriorityPrice));
 
     when(domainMapper.mapToResult(highestPriorityPrice)).thenReturn(expectedResult);
 
@@ -60,7 +69,8 @@ class PriceServiceUnitTest implements TestCategories.UnitTest {
     assertThat(result).contains(expectedResult);
 
     verify(priceRepository)
-        .findApplicablePrice(query.getApplicationDate(), query.getProductId(), query.getBrandId());
+        .findApplicablePrices(query.getApplicationDate(), query.getProductId(), query.getBrandId());
+    verify(priceSelectionStrategy).selectPrice(prices);
     verify(domainMapper).mapToResult(highestPriorityPrice);
   }
 
@@ -70,9 +80,11 @@ class PriceServiceUnitTest implements TestCategories.UnitTest {
     // Given
     PriceQuery query = TestDataFactory.createTestQuery();
 
-    when(priceRepository.findApplicablePrice(
+    when(priceRepository.findApplicablePrices(
             query.getApplicationDate(), query.getProductId(), query.getBrandId()))
-        .thenReturn(Optional.empty());
+        .thenReturn(Collections.emptyList());
+
+    when(priceSelectionStrategy.selectPrice(Collections.emptyList())).thenReturn(Optional.empty());
 
     // When
     Optional<PriceResult> result = priceService.findApplicablePrice(query);
@@ -81,7 +93,8 @@ class PriceServiceUnitTest implements TestCategories.UnitTest {
     assertThat(result).isEmpty();
 
     verify(priceRepository)
-        .findApplicablePrice(query.getApplicationDate(), query.getProductId(), query.getBrandId());
+        .findApplicablePrices(query.getApplicationDate(), query.getProductId(), query.getBrandId());
+    verify(priceSelectionStrategy).selectPrice(Collections.emptyList());
     verifyNoInteractions(domainMapper);
   }
 
@@ -93,9 +106,13 @@ class PriceServiceUnitTest implements TestCategories.UnitTest {
     Price price = TestDataFactory.createTestPrice();
     PriceResult expectedResult = TestDataFactory.createTestPriceResult();
 
-    when(priceRepository.findApplicablePrice(
+    List<Price> prices = List.of(price);
+
+    when(priceRepository.findApplicablePrices(
             query.getApplicationDate(), query.getProductId(), query.getBrandId()))
-        .thenReturn(Optional.of(price));
+        .thenReturn(prices);
+
+    when(priceSelectionStrategy.selectPrice(prices)).thenReturn(Optional.of(price));
 
     when(domainMapper.mapToResult(price)).thenReturn(expectedResult);
 

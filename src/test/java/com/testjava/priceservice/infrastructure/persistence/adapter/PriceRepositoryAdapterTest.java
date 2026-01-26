@@ -8,7 +8,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.Collections;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,17 +53,17 @@ class PriceRepositoryAdapterTest {
             TEST_PRICE_35_50,
             "EUR");
 
-    when(jpaPriceRepository.findApplicablePrice(applicationDate, productId, brandId))
-        .thenReturn(java.util.Optional.of(entity));
+    when(jpaPriceRepository.findApplicablePrices(applicationDate, productId, brandId))
+        .thenReturn(List.of(entity));
 
     // When
-    Optional<Price> result =
-        priceRepositoryAdapter.findApplicablePrice(applicationDate, productId, brandId);
+    List<Price> result =
+        priceRepositoryAdapter.findApplicablePrices(applicationDate, productId, brandId);
 
     // Then
-    assertTrue(result.isPresent());
+    assertEquals(1, result.size());
 
-    Price price = result.get();
+    Price price = result.get(0);
     assertEquals(1L, price.getBrandId());
     assertEquals(1, price.getPriceList());
     assertEquals(35455L, price.getProductId());
@@ -70,7 +71,7 @@ class PriceRepositoryAdapterTest {
     assertEquals(TEST_PRICE_35_50, price.getPrice());
     assertEquals("EUR", price.getCurrency());
 
-    verify(jpaPriceRepository).findApplicablePrice(applicationDate, productId, brandId);
+    verify(jpaPriceRepository).findApplicablePrices(applicationDate, productId, brandId);
   }
 
   @Test
@@ -80,17 +81,17 @@ class PriceRepositoryAdapterTest {
     Long productId = 35455L;
     Long brandId = 1L;
 
-    when(jpaPriceRepository.findApplicablePrice(applicationDate, productId, brandId))
-        .thenReturn(Optional.empty());
+    when(jpaPriceRepository.findApplicablePrices(applicationDate, productId, brandId))
+        .thenReturn(Collections.emptyList());
 
     // When
-    Optional<Price> result =
-        priceRepositoryAdapter.findApplicablePrice(applicationDate, productId, brandId);
+    List<Price> result =
+        priceRepositoryAdapter.findApplicablePrices(applicationDate, productId, brandId);
 
     // Then
     assertTrue(result.isEmpty());
 
-    verify(jpaPriceRepository).findApplicablePrice(applicationDate, productId, brandId);
+    verify(jpaPriceRepository).findApplicablePrices(applicationDate, productId, brandId);
   }
 
   @Test
@@ -103,16 +104,15 @@ class PriceRepositoryAdapterTest {
     PriceEntity entity =
         new PriceEntity(1L, startDate, endDate, 4, 35455L, 1, TEST_PRICE_38_95, "EUR");
 
-    when(jpaPriceRepository.findApplicablePrice(applicationDate, 35455L, 1L))
-        .thenReturn(Optional.of(entity));
+    when(jpaPriceRepository.findApplicablePrices(applicationDate, 35455L, 1L))
+        .thenReturn(List.of(entity));
 
     // When
-    Optional<Price> result =
-        priceRepositoryAdapter.findApplicablePrice(applicationDate, 35455L, 1L);
+    List<Price> result = priceRepositoryAdapter.findApplicablePrices(applicationDate, 35455L, 1L);
 
     // Then
-    assertTrue(result.isPresent());
-    Price price = result.get();
+    assertEquals(1, result.size());
+    Price price = result.get(0);
 
     assertEquals(startDate, price.getStartDate());
     assertEquals(endDate, price.getEndDate());

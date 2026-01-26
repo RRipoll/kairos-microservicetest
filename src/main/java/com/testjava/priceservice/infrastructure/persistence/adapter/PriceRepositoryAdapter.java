@@ -1,7 +1,8 @@
 package com.testjava.priceservice.infrastructure.persistence.adapter;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
@@ -23,7 +24,7 @@ public class PriceRepositoryAdapter implements PriceRepository {
   private final PriceEntityMapper entityMapper;
 
   @Override
-  public Optional<Price> findApplicablePrice(
+  public List<Price> findApplicablePrices(
       LocalDateTime applicationDate, Long productId, Long brandId) {
     log.debug(
         "Searching for applicable prices - date: {}, productId: {}, brandId: {}",
@@ -31,13 +32,11 @@ public class PriceRepositoryAdapter implements PriceRepository {
         productId,
         brandId);
 
-    Optional<PriceEntity> entity =
-        jpaPriceRepository.findApplicablePrice(applicationDate, productId, brandId);
+    List<PriceEntity> entities =
+        jpaPriceRepository.findApplicablePrices(applicationDate, productId, brandId);
 
-    log.debug(
-        "Price entity {}found for given criteria with highest priority",
-        entity.isPresent() ? "" : "not ");
+    log.debug("Found {} price entities matching criteria", entities.size());
 
-    return entity.map(entityMapper::mapToDomain);
+    return entities.stream().map(entityMapper::mapToDomain).collect(Collectors.toList());
   }
 }

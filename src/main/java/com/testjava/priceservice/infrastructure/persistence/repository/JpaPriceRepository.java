@@ -1,7 +1,7 @@
 package com.testjava.priceservice.infrastructure.persistence.repository;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,10 +17,9 @@ public interface JpaPriceRepository extends JpaRepository<PriceEntity, Long> {
       value =
           "SELECT * FROM PRICES p WHERE "
               + "p.PRODUCT_ID = :productId AND p.BRAND_ID = :brandId AND "
-              + "p.START_DATE <= :applicationDate AND p.END_DATE >= :applicationDate "
-              + "ORDER BY p.PRIORITY DESC LIMIT 1",
+              + "p.START_DATE <= :applicationDate AND p.END_DATE >= :applicationDate",
       nativeQuery = true)
-  Optional<PriceEntity> findApplicablePrice(
+  List<PriceEntity> findApplicablePrices(
       @Param("applicationDate") LocalDateTime applicationDate,
       @Param("productId") Long productId,
       @Param("brandId") Long brandId);

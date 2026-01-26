@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -40,8 +40,8 @@ class DatabaseIntegrationTest implements TestCategories.IntegrationTest {
   @Autowired private JpaPriceRepository priceRepository;
 
   @Test
-  @DisplayName("Should query database and return highest priority price")
-  void shouldQueryDatabaseAndReturnHighestPriorityPrice() {
+  @DisplayName("Should query database and return all matching prices")
+  void shouldQueryDatabaseAndReturnAllMatchingPrices() {
     // Given
     LocalDateTime applicationDate = TestDataFactory.TEST_DATE_2020_06_14_16_00;
 
@@ -72,15 +72,15 @@ class DatabaseIntegrationTest implements TestCategories.IntegrationTest {
     entityManager.persistAndFlush(highPriorityPrice);
 
     // When
-    Optional<PriceEntity> result =
-        priceRepository.findApplicablePrice(applicationDate, TEST_PRODUCT_ID, 1L);
+    List<PriceEntity> result =
+        priceRepository.findApplicablePrices(applicationDate, TEST_PRODUCT_ID, 1L);
 
-    // Then
-    assertThat(result).isPresent();
-    PriceEntity price = result.get();
-    assertThat(price.getPriority()).isEqualTo(1); // Highest priority
-    assertThat(price.getPrice()).isEqualTo(TEST_PRICE_25_45);
-    assertThat(price.getPriceList()).isEqualTo(2);
+    // Then - Should return both prices (selection happens in strategy pattern)
+    assertThat(result).hasSize(2);
+    assertThat(result).extracting(PriceEntity::getPriority).containsExactlyInAnyOrder(0, 1);
+    assertThat(result)
+        .extracting(PriceEntity::getPrice)
+        .contains(TEST_PRICE_25_45, TEST_PRICE_35_50);
   }
 
   @Test
@@ -103,8 +103,8 @@ class DatabaseIntegrationTest implements TestCategories.IntegrationTest {
     entityManager.persistAndFlush(pastPrice);
 
     // When
-    Optional<PriceEntity> result =
-        priceRepository.findApplicablePrice(futureDate, TEST_PRODUCT_ID, 1L);
+    List<PriceEntity> result =
+        priceRepository.findApplicablePrices(futureDate, TEST_PRODUCT_ID, 1L);
 
     // Then
     assertThat(result).isEmpty();
@@ -131,17 +131,17 @@ class DatabaseIntegrationTest implements TestCategories.IntegrationTest {
     entityManager.persistAndFlush(exactBoundaryPrice);
 
     // When - Test exact start boundary
-    Optional<PriceEntity> startResult =
-        priceRepository.findApplicablePrice(exactStartTime, TEST_PRODUCT_ID, 1L);
+    List<PriceEntity> startResult =
+        priceRepository.findApplicablePrices(exactStartTime, TEST_PRODUCT_ID, 1L);
 
     // When - Test exact end boundary
-    Optional<PriceEntity> endResult =
-        priceRepository.findApplicablePrice(exactEndTime, TEST_PRODUCT_ID, 1L);
+    List<PriceEntity> endResult =
+        priceRepository.findApplicablePrices(exactEndTime, TEST_PRODUCT_ID, 1L);
 
     // Then
-    assertThat(startResult).isPresent();
-    assertThat(endResult).isPresent();
-    assertThat(startResult.get().getId()).isEqualTo(endResult.get().getId());
+    assertThat(startResult).hasSize(1);
+    assertThat(endResult).hasSize(1);
+    assertThat(startResult.get(0).getId()).isEqualTo(endResult.get(0).getId());
   }
 
   @Test
@@ -177,15 +177,15 @@ class DatabaseIntegrationTest implements TestCategories.IntegrationTest {
     entityManager.persistAndFlush(morningPrice);
 
     // When
-    Optional<PriceEntity> result =
-        priceRepository.findApplicablePrice(applicationDate, TEST_PRODUCT_ID, 1L);
+    List<PriceEntity> result =
+        priceRepository.findApplicablePrices(applicationDate, TEST_PRODUCT_ID, 1L);
 
-    // Then
-    assertThat(result).isPresent();
-    PriceEntity price = result.get();
-    assertThat(price.getPriority()).isEqualTo(1); // Higher priority
-    assertThat(price.getPrice()).isEqualTo(TEST_PRICE_30_50);
-    assertThat(price.getPriceList()).isEqualTo(3);
+    // Then - Should return both overlapping prices
+    assertThat(result).hasSize(2);
+    assertThat(result).extracting(PriceEntity::getPriority).containsExactlyInAnyOrder(0, 1);
+    assertThat(result)
+        .extracting(PriceEntity::getPrice)
+        .contains(TEST_PRICE_30_50, TEST_PRICE_35_50);
   }
 
   @Test
@@ -220,13 +220,13 @@ class DatabaseIntegrationTest implements TestCategories.IntegrationTest {
     entityManager.persistAndFlush(differentProduct);
 
     // When
-    Optional<PriceEntity> result =
-        priceRepository.findApplicablePrice(applicationDate, TEST_PRODUCT_ID, 1L);
+    List<PriceEntity> result =
+        priceRepository.findApplicablePrices(applicationDate, TEST_PRODUCT_ID, 1L);
 
     // Then
-    assertThat(result).isPresent();
-    assertThat(result.get().getProductId()).isEqualTo(TEST_PRODUCT_ID);
-    assertThat(result.get().getPrice()).isEqualTo(TEST_PRICE_35_50);
+    assertThat(result).hasSize(1);
+    assertThat(result.get(0).getProductId()).isEqualTo(TEST_PRODUCT_ID);
+    assertThat(result.get(0).getPrice()).isEqualTo(TEST_PRICE_35_50);
   }
 
   @Test
@@ -261,13 +261,13 @@ class DatabaseIntegrationTest implements TestCategories.IntegrationTest {
     entityManager.persistAndFlush(differentBrand);
 
     // When
-    Optional<PriceEntity> result =
-        priceRepository.findApplicablePrice(applicationDate, TEST_PRODUCT_ID, 1L);
+    List<PriceEntity> result =
+        priceRepository.findApplicablePrices(applicationDate, TEST_PRODUCT_ID, 1L);
 
     // Then
-    assertThat(result).isPresent();
-    assertThat(result.get().getBrandId()).isEqualTo(1L);
-    assertThat(result.get().getPrice()).isEqualTo(TEST_PRICE_35_50);
+    assertThat(result).hasSize(1);
+    assertThat(result.get(0).getBrandId()).isEqualTo(1L);
+    assertThat(result.get(0).getPrice()).isEqualTo(TEST_PRICE_35_50);
   }
 
   @Test
@@ -294,12 +294,12 @@ class DatabaseIntegrationTest implements TestCategories.IntegrationTest {
 
     // When - Query should use indexes efficiently
     long startTime = System.currentTimeMillis();
-    Optional<PriceEntity> result =
-        priceRepository.findApplicablePrice(applicationDate, TEST_PRODUCT_ID, 1L);
+    List<PriceEntity> result =
+        priceRepository.findApplicablePrices(applicationDate, TEST_PRODUCT_ID, 1L);
     long endTime = System.currentTimeMillis();
 
     // Then
-    assertThat(result).isPresent();
+    assertThat(result).isNotEmpty();
     assertThat(endTime - startTime).isLessThan(1000); // Should be fast due to indexes
   }
 }

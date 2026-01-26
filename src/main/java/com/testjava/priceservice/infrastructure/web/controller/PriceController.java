@@ -37,68 +37,123 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/prices")
 @RequiredArgsConstructor
 @Validated
-@Tag(name = "Price API", description = "API for e-commerce price consultation with time-based validity and priority rules")
+@Tag(
+    name = "Price API",
+    description =
+        "API for e-commerce price consultation with time-based validity and priority rules")
 public class PriceController {
 
-    private final FindPriceUseCasePort findPriceUseCase;
-    private final PriceResponseMapper responseMapper;
+  private final FindPriceUseCasePort findPriceUseCase;
+  private final PriceResponseMapper responseMapper;
 
-    @GetMapping
-    @Operation(summary = "Get applicable price for a product", description = "Returns the applicable price for a specific product of a brand at a given date. "
-            + "Automatically selects the price with the highest priority when multiple prices are valid.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Price found successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PriceResponse.class))),
-            @ApiResponse(responseCode = "404", description = "No applicable price found for the given criteria", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid request parameters (e.g., invalid date format)", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "503", description = "Service unavailable due to circuit breaker", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
-    })
-    @CircuitBreaker(name = "priceService", fallbackMethod = "fallbackGetPrice")
-    public ResponseEntity<PriceResponse> getPrice(
-            @Parameter(name = "applicationDate", description = "Date and time for price application in format yyyy-MM-dd-HH:mm:ss", example = "2020-06-14-16:00:00", required = true) @RequestParam("applicationDate") @NotNull(message = "Application date is required") @DateTimeFormat(pattern = DateFormats.API_DATE_TIME_FORMAT) LocalDateTime date,
-            @Parameter(name = "productId", description = "Product identifier", example = "35455", required = true) @RequestParam("productId") @NotNull(message = "Product ID is required") @Positive(message = "Product ID must be positive") Long productId,
-            @Parameter(name = "brandId", description = "Brand identifier (1)", example = "1", required = true) @RequestParam("brandId") @NotNull(message = "Brand ID is required") @Positive(message = "Brand ID must be positive") Long brandId) {
+  @GetMapping
+  @Operation(
+      summary = "Get applicable price for a product",
+      description =
+          "Returns the applicable price for a specific product of a brand at a given date. "
+              + "Automatically selects the price with the highest priority when multiple prices are valid.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Price found successfully",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = PriceResponse.class))),
+        @ApiResponse(
+            responseCode = "404",
+            description = "No applicable price found for the given criteria",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Invalid request parameters (e.g., invalid date format)",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(
+            responseCode = "503",
+            description = "Service unavailable due to circuit breaker",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class)))
+      })
+  @CircuitBreaker(name = "priceService", fallbackMethod = "fallbackGetPrice")
+  public ResponseEntity<PriceResponse> getPrice(
+      @Parameter(
+              name = "applicationDate",
+              description = "Date and time for price application in format yyyy-MM-dd-HH:mm:ss",
+              example = "2020-06-14-16:00:00",
+              required = true)
+          @RequestParam("applicationDate")
+          @NotNull(message = "Application date is required")
+          @DateTimeFormat(pattern = DateFormats.API_DATE_TIME_FORMAT)
+          LocalDateTime date,
+      @Parameter(
+              name = "productId",
+              description = "Product identifier",
+              example = "35455",
+              required = true)
+          @RequestParam("productId")
+          @NotNull(message = "Product ID is required")
+          @Positive(message = "Product ID must be positive")
+          Long productId,
+      @Parameter(
+              name = "brandId",
+              description = "Brand identifier (1)",
+              example = "1",
+              required = true)
+          @RequestParam("brandId")
+          @NotNull(message = "Brand ID is required")
+          @Positive(message = "Brand ID must be positive")
+          Long brandId) {
 
-        log.info(
-                "Received price request - date: {}, productId: {}, brandId: {}", date, productId, brandId);
+    log.info(
+        "Received price request - date: {}, productId: {}, brandId: {}", date, productId, brandId);
 
-        // Create query
-        PriceQuery query = new PriceQuery(date, productId, brandId);
+    // Create query
+    PriceQuery query = new PriceQuery(date, productId, brandId);
 
-        // Execute use case
-        Optional<PriceResult> result = findPriceUseCase.execute(query);
+    // Execute use case
+    Optional<PriceResult> result = findPriceUseCase.execute(query);
 
-        // Handle response
-        return result
-                .map(responseMapper::mapToResponse)
-                .map(
-                        response -> {
-                            log.info("Price request successful - returning price: {}", response.getPrice());
-                            return ResponseEntity.ok(response);
-                        })
-                .orElseThrow(
-                        () -> {
-                            log.info("Price request completed - no price found for given criteria");
-                            return new PriceNotFoundException(productId, brandId, date.toString());
-                        });
+    // Handle response
+    return result
+        .map(responseMapper::mapToResponse)
+        .map(
+            response -> {
+              log.info("Price request successful - returning price: {}", response.getPrice());
+              return ResponseEntity.ok(response);
+            })
+        .orElseThrow(
+            () -> {
+              log.info("Price request completed - no price found for given criteria");
+              return new PriceNotFoundException(productId, brandId, date.toString());
+            });
+  }
+
+  /** Fallback method for getPrice when the circuit is open or an error occurs. */
+  public ResponseEntity<PriceResponse> fallbackGetPrice(
+      LocalDateTime date, Long productId, Long brandId, Exception e) {
+    // Re-throw PriceNotFoundException to be handled by GlobalExceptionHandler
+    // This is a valid business scenario, not a system failure
+    if (e instanceof PriceNotFoundException) {
+      throw (PriceNotFoundException) e;
     }
 
-    /** Fallback method for getPrice when the circuit is open or an error occurs. */
-    public ResponseEntity<PriceResponse> fallbackGetPrice(
-            LocalDateTime date, Long productId, Long brandId, Exception e) {
-        // Re-throw PriceNotFoundException to be handled by GlobalExceptionHandler
-        // This is a valid business scenario, not a system failure
-        if (e instanceof PriceNotFoundException) {
-            throw (PriceNotFoundException) e;
-        }
+    log.error(
+        "Circuit breaker fallback triggered for price request - date: {}, productId: {}, brandId: {}. Error: {}",
+        date,
+        productId,
+        brandId,
+        e.getMessage());
 
-        log.error(
-                "Circuit breaker fallback triggered for price request - date: {}, productId: {}, brandId: {}. Error: {}",
-                date,
-                productId,
-                brandId,
-                e.getMessage());
-
-        // Return 503 Service Unavailable when the system is under pressure or failing
-        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
-    }
+    // Return 503 Service Unavailable when the system is under pressure or failing
+    return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+  }
 }
