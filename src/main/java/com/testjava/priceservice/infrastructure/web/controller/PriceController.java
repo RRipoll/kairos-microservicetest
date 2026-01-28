@@ -7,7 +7,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +20,6 @@ import com.testjava.priceservice.infrastructure.web.dto.ErrorResponse;
 import com.testjava.priceservice.infrastructure.web.dto.PriceResponse;
 import com.testjava.priceservice.infrastructure.web.mapper.PriceResponseMapper;
 
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -70,20 +68,12 @@ public class PriceController {
                     schema = @Schema(implementation = ErrorResponse.class))),
         @ApiResponse(
             responseCode = "400",
-            description = "Invalid request parameters (e.g., invalid date format)",
-            content =
-                @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = ErrorResponse.class))),
-        @ApiResponse(
-            responseCode = "503",
-            description = "Service unavailable due to circuit breaker",
+            description = "Invalid request parameters (e.g., invalid date format, negative IDs)",
             content =
                 @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = ErrorResponse.class)))
       })
-  @CircuitBreaker(name = "priceService", fallbackMethod = "fallbackGetPrice")
   public ResponseEntity<PriceResponse> getPrice(
       @Parameter(
               name = "applicationDate",
@@ -135,25 +125,5 @@ public class PriceController {
               log.info("Price request completed - no price found for given criteria");
               return new PriceNotFoundException(productId, brandId, date.toString());
             });
-  }
-
-  /** Fallback method for getPrice when the circuit is open or an error occurs. */
-  public ResponseEntity<PriceResponse> fallbackGetPrice(
-      LocalDateTime date, Long productId, Long brandId, Exception e) {
-    // Re-throw PriceNotFoundException to be handled by GlobalExceptionHandler
-    // This is a valid business scenario, not a system failure
-    if (e instanceof PriceNotFoundException) {
-      throw (PriceNotFoundException) e;
-    }
-
-    log.error(
-        "Circuit breaker fallback triggered for price request - date: {}, productId: {}, brandId: {}. Error: {}",
-        date,
-        productId,
-        brandId,
-        e.getMessage());
-
-    // Return 503 Service Unavailable when the system is under pressure or failing
-    return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
   }
 }

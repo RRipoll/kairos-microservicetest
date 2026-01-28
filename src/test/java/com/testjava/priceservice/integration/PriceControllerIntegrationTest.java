@@ -127,4 +127,34 @@ class PriceControllerIntegrationTest {
         .andExpect(jsonPath("$.details.productId").value(35455))
         .andExpect(jsonPath("$.details.brandId").value(1));
   }
+
+  @Test
+  @DisplayName("Should return 400 when productId is negative")
+  void shouldReturn400_WhenProductIdIsNegative() throws Exception {
+    mockMvc
+        .perform(
+            get("/api/prices")
+                .param("applicationDate", "2020-06-14-10:00:00")
+                .param("productId", "-1")
+                .param("brandId", "1"))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.status").value(400))
+        .andExpect(jsonPath("$.error").exists())
+        .andExpect(jsonPath("$.message").value("Product ID must be positive"));
+  }
+
+  @Test
+  @DisplayName("Should return 400 when brandId is negative")
+  void shouldReturn400_WhenBrandIdIsNegative() throws Exception {
+    mockMvc
+        .perform(
+            get("/api/prices")
+                .param("applicationDate", "2020-06-14-10:00:00")
+                .param("productId", "35455")
+                .param("brandId", "-1"))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.status").value(400))
+        .andExpect(jsonPath("$.error").exists())
+        .andExpect(jsonPath("$.message").value("Brand ID must be positive"));
+  }
 }

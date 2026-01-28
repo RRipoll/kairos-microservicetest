@@ -81,7 +81,7 @@ All 108 tests run as part of the `./gradlew build` command:
 - **Coverage**: 93% line coverage
 - **Test Categories**:
   - Unit Tests (Domain, Application, Infrastructure)
-  - Integration Tests (Database, Security, Circuit Breaker)
+  - Integration Tests (Database, Security, Validation)
   - Performance Tests
 
 ### Coverage Reporting
@@ -459,7 +459,6 @@ kubectl delete -f k8s/
 ## 📞 Support & Resources
 
 ### Documentation
-- **Architecture**: See [CLAUDE.md](CLAUDE.md)
 - **API Documentation**: Available at `/swagger-ui.html` when running
 - **Changelog**: See [CHANGELOG.md](CHANGELOG.md)
 

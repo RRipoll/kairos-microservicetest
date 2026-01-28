@@ -13,6 +13,17 @@ A production-ready Spring Boot microservice implementing **Hexagonal Architectur
 
 The service provides intelligent price resolution with temporal validity and priority rules, automatically selecting the most applicable price for products based on date, brand, and priority hierarchy.
 
+#############################################################
+#### Business Logic needs to be enhanced
+There are a lot of countries with double currency in commerce. (European non-Euro countries as Poland, South-American countries)
+We need to enhance the business logic to handle this case.
+Options:
+- Add currency parameter in the call.
+- Return a list of prices/currencies values.
+
+#############################################################
+
+
 ### Core Features
 
 ✅ **Smart Price Resolution** - Automatic highest-priority price selection
@@ -20,7 +31,6 @@ The service provides intelligent price resolution with temporal validity and pri
 ✅ **Multi-Brand Support** - Brand-specific pricing management
 ✅ **RESTful API** - Clean, well-documented endpoints with OpenAPI/Swagger
 ✅ **Security** - Spring Security with HTTP Basic authentication
-✅ **Resilience** - Circuit breaker pattern with Resilience4j
 ✅ **Monitoring** - Spring Boot Actuator for health checks and metrics
 ✅ **Code Quality** - Checkstyle, Spotless formatting, and 93% test coverage
 ✅ **Production Ready** - Kubernetes manifests, Docker support, CI/CD pipelines
@@ -63,7 +73,7 @@ The service provides intelligent price resolution with temporal validity and pri
 | **Domain** | `PriceService` | Business logic implementation |
 | **Domain** | `PriceQueryValidator` | Domain validation rules |
 | **Application** | `FindPriceUseCase` | Use case orchestration |
-| **Infrastructure** | `PriceController` | REST API endpoints with Circuit Breaker |
+| **Infrastructure** | `PriceController` | REST API endpoints |
 | **Infrastructure** | `PriceRepositoryAdapter` | Data persistence adapter |
 | **Infrastructure** | `SecurityConfig` | Authentication and security headers |
 
@@ -138,17 +148,22 @@ Authorization: Basic <credentials>
   "timestamp": "2026-01-22T10:30:00Z",
   "status": 404,
   "error": "Price Not Found",
-  "message": "No applicable price found for the given criteria"
+  "message": "No applicable price found for the given criteria",
+  "details": {
+    "productId": 35455,
+    "brandId": 1,
+    "applicationDate": "2026-01-22T10:30:00"
+  }
 }
 ```
 
-**⚠️ Service Unavailable (503)** - Circuit Breaker Open
+**⚠️ Bad Request (400)** - Invalid Parameters
 ```json
 {
   "timestamp": "2026-01-22T10:30:00Z",
-  "status": 503,
-  "error": "Service Unavailable",
-  "message": "Service temporarily unavailable"
+  "status": 400,
+  "error": "Validation Error",
+  "message": "Product ID must be positive"
 }
 ```
 
@@ -194,7 +209,7 @@ The project implements comprehensive testing with **93% test coverage** and **10
 
 - **Total Tests**: 108 tests (all passing)
 - **Unit Tests**: Domain, Application, and Infrastructure layers
-- **Integration Tests**: Database, Security, Circuit Breaker
+- **Integration Tests**: Database, Security, Validation
 - **Test Coverage**: 93% line coverage
 - **Test Categories**: Unit, Integration, Performance, Security
 
@@ -288,21 +303,6 @@ Configured security headers:
 - **X-Content-Type-Options**: nosniff (prevents MIME sniffing)
 - **X-XSS-Protection**: Enabled
 - **Strict-Transport-Security**: 1 year, includeSubDomains
-
-## 🛡️ Resilience
-
-### Circuit Breaker
-
-The price service includes **Resilience4j Circuit Breaker** protection:
-
-**Configuration**:
-- Sliding window: 10 calls
-- Minimum calls: 5
-- Failure threshold: 50%
-- Wait duration in open state: 5 seconds
-- Fallback: Returns 503 Service Unavailable
-
-**Monitoring**: Circuit breaker state available at `/actuator/health`
 
 ## 🚀 Deployment
 
@@ -408,7 +408,6 @@ GitHub Actions workflow (`.github/workflows/ci-cd.yml`):
 | **Build Tool** | Gradle 8.12 |
 | **Testing** | JUnit 5, Mockito, AssertJ |
 | **Documentation** | OpenAPI 3, Swagger UI |
-| **Resilience** | Resilience4j |
 | **Code Quality** | Checkstyle, Spotless, JaCoCo |
 | **Containerization** | Docker |
 | **Orchestration** | Kubernetes |
@@ -426,6 +425,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📚 Documentation
 
-- **Architecture**: See [CLAUDE.md](CLAUDE.md) for detailed architecture guide
 - **API Documentation**: Available at `/swagger-ui.html` when running
 - **Changelog**: See [CHANGELOG.md](CHANGELOG.md) for version history

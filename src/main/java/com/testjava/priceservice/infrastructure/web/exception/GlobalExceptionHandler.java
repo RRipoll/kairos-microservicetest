@@ -3,6 +3,10 @@ package com.testjava.priceservice.infrastructure.web.exception;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -133,6 +137,27 @@ public class GlobalExceptionHandler {
             .status(HttpStatus.BAD_REQUEST.value())
             .error("Invalid parameter type")
             .message("Parameter '" + ex.getName() + "' has invalid value: " + ex.getValue())
+            .build();
+
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+  }
+
+  /** Handles constraint violations (e.g., @Positive validation). Maps to HTTP 400 Bad Request. */
+  @ExceptionHandler(ConstraintViolationException.class)
+  public ResponseEntity<ErrorResponse> handleConstraintViolation(ConstraintViolationException ex) {
+    log.warn("Constraint violation: {}", ex.getMessage());
+
+    String message =
+        ex.getConstraintViolations().stream()
+            .map(ConstraintViolation::getMessage)
+            .collect(Collectors.joining(", "));
+
+    ErrorResponse body =
+        ErrorResponse.builder()
+            .timestamp(LocalDateTime.now())
+            .status(HttpStatus.BAD_REQUEST.value())
+            .error(ErrorMessages.VALIDATION_ERROR)
+            .message(message)
             .build();
 
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
