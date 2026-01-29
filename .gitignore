@@ -1,9 +1,9 @@
 # Compiled class file
 *.class
-
+.gradle
 # Log file
 *.log
-
+build/
 # BlueJ files
 *.ctxt
 
